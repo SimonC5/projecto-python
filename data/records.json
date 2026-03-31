@@ -1,0 +1,23 @@
+[
+    {
+        "id": "1",
+        "name": "Liam Nakamura",
+        "email": "liam.nakamura@gmail.com",
+        "age": 38,
+        "status": "married"
+    },
+    {
+        "id": "2",
+        "name": "Valentina Cruz",
+        "email": "val.cruz@gmail.com",
+        "age": 51,
+        "status": "widowed"
+    },
+    {
+        "id": "3",
+        "name": "Omar Fitzgerald",
+        "email": "omar.fitz@gmail.com",
+        "age": 23,
+        "status": "single"
+    }
+    ]

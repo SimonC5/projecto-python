@@ -7,15 +7,20 @@ from validate import (
     REGISTERED_IDS,
     REGISTERED_EMAILS,
 )
-
+from file import load_data, save_data
 
 class RegisterService:
     def __init__(self):
-        self._registers = []
-        self._ids = REGISTERED_IDS
-        self._emails = REGISTERED_EMAILS
+         self._registers = load_data()
+         self._ids = REGISTERED_IDS
+         self._emails = REGISTERED_EMAILS
 
-    def create_record(self, id, name, email, age, status):
+
+for r in self._registers:
+            self._ids.add(r["id"])
+            self._emails.add(r["email"])
+
+    def __create_record(self, id, name, email, age, status):
         errors = []
 
         ok, msg = validate_id(id)
@@ -52,6 +57,8 @@ class RegisterService:
         self._registers.append(record)
         self._ids.add(id)
         self._emails.add(email.strip().lower())
+
+        save_data(self._registers)
 
         return record
 

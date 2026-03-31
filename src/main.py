@@ -1,5 +1,10 @@
 from service import RegisterService
 
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_PATH = os.path.join(BASE_DIR, "data", "records.json")
+
 
 def print_record(r, i):
     print(
@@ -36,13 +41,14 @@ def main():
     try_create(service, id="4", name="Zoe",  email="not-an-email",  age=25,  status="single")
     try_create(service, id="5", name="Kwame", email="kwame@gmail.com", age=200, status="married")
 
-    print("\n──── Records in memory ───────────────────────────────")
+    print("\n──── Records in memory & file ────────────────────────")
     records = service.list_records()
     for i, r in enumerate(records, start=1):
         print_record(r, i)
 
     print(f"\n  Total: {len(records)} record(s)")
-    print(f"  Registered IDs (set): {service._ids}")
+    print(f"\n   Registered IDs (set): {service._ids}")
+    print("  Data saved to → data/records.json")
 
 
 if __name__ == "__main__":
