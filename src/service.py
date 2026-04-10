@@ -11,16 +11,15 @@ from file import load_data, save_data
 
 class RegisterService:
     def __init__(self):
-         self._registers = load_data()
-         self._ids = REGISTERED_IDS
-         self._emails = REGISTERED_EMAILS
+        self._registers = load_data()
+        self._ids = REGISTERED_IDS
+        self._emails = REGISTERED_EMAILS
 
-
-for r in self._registers:
+        for r in self._registers:
             self._ids.add(r["id"])
             self._emails.add(r["email"])
 
-    def __create_record(self, id, name, email, age, status):
+    def create_record(self, id, name, email, age, status):
         errors = []
 
         ok, msg = validate_id(id)
