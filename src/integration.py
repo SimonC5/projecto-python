@@ -1,17 +1,19 @@
 
-from faker import Faker
 import random
+from typing import Any
 
-fake = Faker()
+from faker import Faker
 
-VALID_STATUSES = ["single", "married", "widowed", "divorced"]
+VALID_STATUSES: list[str] = ["single", "married", "widowed", "divorced"]
+
+_faker = Faker()
 
 
-def build_record(*args, **kwargs):
-    """
-    Función genérica que construye un registro a partir de kwargs.
-    *args  → ignorados (flexibilidad futura)
-    **kwargs → campos del registro (id, name, email, age, status)
+def build_record(**kwargs: Any) -> dict[str, Any]:
+    """Build a record dict from keyword arguments.
+
+    Unknown keys are passed through; missing keys fall back to safe defaults.
+    This allows callers to supply only the fields they care about.
     """
     return {
         "id":     str(kwargs.get("id", "")),
@@ -22,28 +24,29 @@ def build_record(*args, **kwargs):
     }
 
 
-def generate_fake_records(n=10):
-    """
-    Genera n registros falsos usando Faker.
-    Devuelve una lista de dicts listos para pasar a RegisterService.
-    """
-    records = []
-    used_emails = set()
+def generate_fake_records(n: int = 10) -> list[dict[str, Any]]:
+    """Return a list of *n* random person records using Faker.
 
-    for i in range(n):
-        # Garantizar email único dentro del lote
-        email = fake.email()
+    E-mail uniqueness is guaranteed within the returned batch.
+    IDs are ``fake-1`` … ``fake-n``.
+    """
+    used_emails: set[str] = set()
+    records: list[dict[str, Any]] = []
+
+    for i in range(1, n + 1):
+        email = _faker.email()
         while email in used_emails:
-            email = fake.email()
+            email = _faker.email()
         used_emails.add(email)
 
-        record = build_record(
-            id=f"fake-{i+1}",
-            name=fake.name(),
-            email=email,
-            age=random.randint(18, 80),
-            status=random.choice(VALID_STATUSES),
+        records.append(
+            build_record(
+                id=f"fake-{i}",
+                name=_faker.name(),
+                email=email,
+                age=random.randint(18, 80),
+                status=random.choice(VALID_STATUSES),
+            )
         )
-        records.append(record)
 
     return records

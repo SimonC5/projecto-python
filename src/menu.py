@@ -2,34 +2,35 @@
 from service import RegisterService
 from integration import generate_fake_records
 
-def print_header(title):
+
+def _header(title: str) -> None:
     bar = "─" * 56
-    print(f"\n{bar}")
-    print(f"  {title}")
-    print(bar)
+    print(f"\n{bar}\n  {title}\n{bar}")
 
 
-def print_record(r, i):
-    print(
-        f"  [{i}] ID: {r['id']:<10} | "
-        f"Name: {r['name']:<22} | "
-        f"Age: {r['age']:<4} | "
-        f"Status: {r['status']:<10} | "
-        f"Email: {r['email']}"
+def _fmt_record(record: dict, index: int) -> str:
+    return (
+        f"  [{index}] ID: {record['id']:<10} | "
+        f"Name: {record['name']:<22} | "
+        f"Age: {record['age']:<4} | "
+        f"Status: {record['status']:<10} | "
+        f"Email: {record['email']}"
     )
 
-
-def print_menu():
-    print_header("GESTIÓN DE REGISTROS — MENÚ PRINCIPAL")
-    print("  1. Crear registro")
-    print("  2. Listar registros")
-    print("  3. Generar 10 registros falsos (Faker)")
-    print("  0. Salir")
+def _print_menu() -> None:
+    _header("GESTIÓN DE REGISTROS — MENÚ PRINCIPAL")
+    options = [
+        ("1", "Crear registro"),
+        ("2", "Listar registros"),
+        ("3", "Generar 10 registros falsos (Faker)"),
+        ("0", "Salir"),
+    ]
+    for key, label in options:
+        print(f"  {key}. {label}")
     print()
 
-
-def action_create(service):
-    print_header("CREAR REGISTRO")
+def _action_create(service: RegisterService) -> None:
+    _header("CREAR REGISTRO")
     id_val  = input("  ID     : ").strip()
     name    = input("  Nombre : ").strip()
     email   = input("  Email  : ").strip()
@@ -45,58 +46,58 @@ def action_create(service):
     try:
         service.create_record(id=id_val, name=name, email=email, age=age, status=status)
         print(f"  ✓ Registro creado → ID='{id_val}'")
-    except ValueError as e:
-        print(f"  ✗ Error de validación:\n  {e}")
+    except ValueError as exc:
+        print(f"  ✗ Error de validación:\n  {exc}")
 
 
-def action_list(service):
-    print_header("LISTADO DE REGISTROS")
+def _action_list(service: RegisterService) -> None:
+    _header("LISTADO DE REGISTROS")
     records = service.list_records()
     if not records:
         print("  (No hay registros guardados)")
         return
-    for i, r in enumerate(records, start=1):
-        print_record(r, i)
+    for i, record in enumerate(records, start=1):
+        print(_fmt_record(record, i))
     print(f"\n  Total: {len(records)} registro(s)")
 
 
-def action_generate_fake(service):
-    print_header("GENERAR REGISTROS FALSOS CON FAKER")
+def _action_generate_fake(service: RegisterService) -> None:
+    _header("GENERAR REGISTROS FALSOS CON FAKER")
     print("  Generando 10 registros…\n")
+    created = skipped = 0
 
-    fake_records = generate_fake_records(10)
-    created = 0
-    skipped = 0
-
-    for r in fake_records:
+    for record in generate_fake_records(10):
         try:
-            service.create_record(**r)
-            print(f"  ✓ {r['name']} — {r['email']}")
+            service.create_record(**record)
+            print(f"  ✓  {record['name']} — {record['email']}")
             created += 1
-        except ValueError as e:
-            # Puede ocurrir si el ID o email ya existe entre corridas
-            print(f"  ✗ Omitido ({r['id']}): {e}")
+        except ValueError as exc:
+            print(f"  ✗  Omitido ({record['id']}): {exc}")
             skipped += 1
 
     print(f"\n  Resultado: {created} creados, {skipped} omitidos.")
     print("  Datos guardados en data/records.json")
 
-def run():
+_ACTIONS = {
+    "1": _action_create,
+    "2": _action_list,
+    "3": _action_generate_fake,
+}
+
+
+def run() -> None:
+    """Start the interactive console loop."""
     service = RegisterService()
 
     while True:
-        print_menu()
+        _print_menu()
         choice = input("  Selecciona una opción: ").strip()
 
-        if choice == "1":
-            action_create(service)
-        elif choice == "2":
-            action_list(service)
-        elif choice == "3":
-            action_generate_fake(service)
-        elif choice == "0":
+        if choice == "0":
             print("\n  Hasta luego 👋\n")
             break
+        elif choice in _ACTIONS:
+            _ACTIONS[choice](service)
         else:
             print("  ✗ Opción inválida. Intenta de nuevo.")
 
